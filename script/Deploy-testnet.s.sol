@@ -12,12 +12,11 @@ contract Deploy is Script {
     function run() public {
 
          vm.startBroadcast();
-        ERC20Dummy token = new ERC20Dummy(address(this));
-        SrDegenDrink drink = new SrDegenDrink(ERC20(token));
+        address tokenAddress = vm.envAddress("TOKEN_ADDRESS");
+        SrDegenDrink drink = new SrDegenDrink(ERC20(tokenAddress));
 
         console.logString(
             string.concat(
-                "ERC20Dummy deployed at: ", vm.toString(address(token)),
                 "SrDegenDrink deployed at: ", vm.toString(address(drink))
             )
         );
