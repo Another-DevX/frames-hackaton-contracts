@@ -14,7 +14,7 @@ contract Deploy is Script {
          vm.startBroadcast();
         address tokenAddress = vm.envAddress("TOKEN_ADDRESS");
         SrDegenDrink drink = new SrDegenDrink(ERC20(tokenAddress));
-
+    
         console.logString(
             string.concat(
                 "SrDegenDrink deployed at: ", vm.toString(address(drink))

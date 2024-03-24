@@ -15,10 +15,13 @@ contract Deploy is Script {
         ERC20Dummy token = new ERC20Dummy(address(this));
         SrDegenDrink drink = new SrDegenDrink(ERC20(token));
 
+        token.approve(address(drink), 1000000* 10**18);
+
+
         console.logString(
             string.concat(
                 "ERC20Dummy deployed at: ", vm.toString(address(token)),
-                "SrDegenDrink deployed at: ", vm.toString(address(drink))
+                "\n SrDegenDrink deployed at: ", vm.toString(address(drink))
             )
         );
             vm.stopBroadcast();
