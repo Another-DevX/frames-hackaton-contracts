@@ -26,11 +26,11 @@ contract SrDegenDrink is ERC1155,Ownable, ERC1155Supply {
 
     }
 
-    function mint(address account, uint256 id, uint256 amount, bytes memory data)
+    function mint(address account, uint256 id, uint256 amount, string memory CID)
         public
     {
-        uint256 price = calculatePrice(super.totalSupply(id));
-        _tokenCIDs[id] = string(data);
+        uint256 price = calculatePrice(super.totalSupply(id), amount);
+        _tokenCIDs[id] = CID;
 
         require(_token.transferFrom(account,_creators[id].creator ,price), "SrDegenDrink: transfer failed");
         _mint(account, id, amount, "");
@@ -39,7 +39,7 @@ contract SrDegenDrink is ERC1155,Ownable, ERC1155Supply {
     function mint(address account, uint256 id, uint256 amount)
         public
     {
-        uint256 price = calculatePrice(super.totalSupply(id));
+        uint256 price = calculatePrice(super.totalSupply(id), amount);
         require(super.totalSupply(id) > 0, "SrDegenDrink: token not exist");
         require(_token.transferFrom(account,_creators[id].creator ,price), "SrDegenDrink: transfer failed");
         _mint(account, id, amount, "");
@@ -52,29 +52,26 @@ contract SrDegenDrink is ERC1155,Ownable, ERC1155Supply {
 
     }
 
+     function calculatePrice(uint256 supply, uint256 amount)
+        public
+        pure
+        returns (uint256)
+    {
+         require(amount <= 10, "The max mint per transaction are 10");
 
-    /// @notice Calculates a price based on an input, applying an exponential factor of 1.1.
-    /// @dev This function uses a square-and-multiply algorithm for computing 1.1 ** input,
-    /// adjusted to work with an ERC20 token that has 16 decimals.
-    /// The square-and-multiply algorithm is efficient and reduces gas costs compared with
-    /// direct exponentiation, especially for large 'input' values.
-    /// @param input The exponent used to calculate the price, where the price is (1.1 ** input).
-    /// @return result The calculated price, adjusted to account for 16 decimals,
-    /// following the ERC20 token decimals convention.
-    function calculatePrice(uint256 input) public pure returns (uint256) {
-        uint256 DECIMALS = 10**18;
-        uint256 base = 11 * DECIMALS / 10; 
-        uint256 result = DECIMALS; 
+    uint256 basePrice = 1 ether; // Precio base por token
+    uint256 increment = 1 ether; // Incremento fijo del precio por cada token adicional en el supply total
 
-        while (input != 0) {
-            if (input % 2 != 0) {
-                result = (result * base) / DECIMALS;
-            }
-            base = (base * base) / DECIMALS;
-            input /= 2;
-        }
+    uint256 totalPrice = 0;
 
-        return result;
+    for (uint256 i = 0; i < amount; i++) {
+        uint256 currentPrice = basePrice + (increment * (supply + i));
+
+        // Suma el precio del token actual al totalPrice
+        totalPrice += currentPrice;
+    }
+
+    return totalPrice;
     }
 
     function updateERC20(ERC20 token) external onlyOwner {
