@@ -71,6 +71,7 @@ contract SrDegenDrink is ERC1155, Ownable, ERC1155Supply {
 
     function _withdraw() public onlyOwner {
         uint256 amount = _internalBalance;
+        _internalBalance = 0;
         require(_token.transfer(msg.sender, amount));
     }
 
@@ -81,7 +82,7 @@ contract SrDegenDrink is ERC1155, Ownable, ERC1155Supply {
     {
         require(amount <= 10, "The max mint per transaction are 10");
 
-        uint256 basePrice = 1 ether; // Precio base por token
+        uint256 basePrice = 69 ether; // Precio base por token
         uint256 increment = 1 ether; // Incremento fijo del precio por cada token adicional en el supply total
 
         uint256 totalPrice = 0;
